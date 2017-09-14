@@ -4,6 +4,8 @@
  */
 package org.tamacat.mvc.oauth;
 
+import java.util.Base64;
+
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +16,7 @@ import org.tamacat.log.LogFactory;
 import org.tamacat.mvc.error.UnauthorizedException;
 import org.tamacat.mvc.oauth.config.OAuthProviderConfig;
 import org.tamacat.mvc.oauth.error.BadRequestException;
+import org.tamacat.mvc.oauth.util.AuthorizationUtils;
 import org.tamacat.mvc.util.ServletUtils;
 import org.tamacat.util.StringUtils;
 
@@ -34,12 +37,31 @@ public class OAuthRequestHandler {
 		if (isTokenAccessRequest(req)) {
 			//POST /token HTTP/1.1
 			//grant_type=client_credentials&client_id=xxxx&client_secret=xxxx
-			String clientId = req.getParameter("client_id");
-			String clientSecret = req.getParameter("client_secret");
-			LOG.trace("grant_type="+req.getParameter("grant_type"));
-			LOG.trace("client_id="+clientId);
-			LOG.trace("client_secret="+clientSecret);
-			if ("POST".equalsIgnoreCase(req.getMethod()) && "client_credentials".equals(req.getParameter("grant_type"))) {
+			String grantType = req.getParameter("grant_type");
+			LOG.trace("grant_type="+grantType);
+			if ("POST".equalsIgnoreCase(req.getMethod()) && "client_credentials".equals(grantType)) {
+				String b64Encoded = AuthorizationUtils.getBasicAuthAccessToken(req);
+				String clientId = null;
+				String clientSecret = null;
+				if (StringUtils.isNotEmpty(b64Encoded)) {
+					String token = new String(Base64.getUrlDecoder().decode(b64Encoded));
+					if (StringUtils.isNotEmpty(token)) {
+						String[] clientIdSecret = StringUtils.split(token, ":");
+						if (clientIdSecret.length == 2) {
+							clientId = clientIdSecret[0];
+							clientSecret = clientIdSecret[1];
+						}
+					}
+				} else {
+					clientId = req.getParameter("client_id");
+					clientSecret = req.getParameter("client_secret");
+				}
+				LOG.trace("client_id="+clientId);
+				LOG.trace("client_secret="+clientSecret);
+				
+				if (StringUtils.isEmpty(clientId) || StringUtils.isEmpty(clientSecret)) {
+					throw new UnauthorizedException();
+				}
 				if (auth.authorization(clientId, clientSecret) == false) {
 					throw new UnauthorizedException();
 				}
