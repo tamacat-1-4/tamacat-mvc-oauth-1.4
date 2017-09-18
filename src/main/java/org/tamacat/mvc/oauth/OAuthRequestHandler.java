@@ -34,9 +34,10 @@ public class OAuthRequestHandler {
 	}
 	
 	public boolean handleOAuthRequest(HttpServletRequest req, HttpServletResponse resp) {
+		//POST /token HTTP/1.1
 		if (isTokenAccessRequest(req)) {
-			//POST /token HTTP/1.1
-			//grant_type=client_credentials&client_id=xxxx&client_secret=xxxx
+			//Client Credentials Grant
+			//https://tools.ietf.org/html/rfc6749#section-4.4
 			String grantType = req.getParameter("grant_type");
 			LOG.trace("grant_type="+grantType);
 			if ("POST".equalsIgnoreCase(req.getMethod()) && "client_credentials".equals(grantType)) {
@@ -73,8 +74,10 @@ public class OAuthRequestHandler {
 					return true;
 				}
 			}
-			throw new BadRequestException();
+			throw new BadRequestException(
+				"The grant_type parameter must not be empty for the token endpoint.");
 		} else {
+			//Check access_token
 			String token = getBearerToken(req, resp);
 			LOG.trace(token);
 			if (StringUtils.isNotEmpty(token)) {
@@ -92,8 +95,7 @@ public class OAuthRequestHandler {
 	
 	public String generateAccessToken(String clientId, String clientSecret) {
 		if (StringUtils.isNotEmpty(clientId)) {
-			String accessToken = config.generateAccessToken(
-					clientId, auth.getJsonWebToken(clientId));
+			String accessToken = config.generateAccessToken(clientId, auth.getJsonWebToken(clientId));
 			
 			JsonObjectBuilder json = Json.createObjectBuilder();
 			json.add("access_token", accessToken)
