@@ -1,4 +1,8 @@
-package org.tamacat.mvc.oauth.token;
+/*
+ * Copyright (c) 2017 tamacat.org
+ * All rights reserved.
+ */
+package org.tamacat.mvc.oauth.provider.jwt;
 
 import java.util.Date;
 
@@ -15,10 +19,6 @@ import com.nimbusds.jwt.SignedJWT;
 
 import net.minidev.json.JSONObject;
 
-/*
- * Copyright (c) 2017 tamacat.org
- * All rights reserved.
- */
 public class OAuthCodeGenerator {
 	static final Log LOG = LogFactory.getLog(OAuthCodeGenerator.class);
 	
@@ -66,8 +66,7 @@ public class OAuthCodeGenerator {
 		return false;
 	}
 	
-	public boolean validateAccessToken(String token) {
-		SignedJWT jwt = parseSignedJWT(token);
+	public boolean validateAccessToken(SignedJWT jwt) {
 		try {
 			JWSVerifier verifier = new DefaultJWSVerifierFactory()
 				.createJWSVerifier(jwt.getHeader(), provider.getRSAPublicKey());
@@ -84,6 +83,7 @@ public class OAuthCodeGenerator {
 					LOG.warn("access_token exp is empty.");
 					return false;
 				}
+				System.out.println(json.getAsString("aud"));
 				return true;
 			} else {
 				return false;
@@ -94,7 +94,7 @@ public class OAuthCodeGenerator {
 		}
 	}
 	
-	SignedJWT parseSignedJWT(String tokenString) {
+	public SignedJWT parseSignedJWT(String tokenString) {
 		try {
 			return (SignedJWT) JWTParser.parse(tokenString);
 		} catch (java.text.ParseException e) {

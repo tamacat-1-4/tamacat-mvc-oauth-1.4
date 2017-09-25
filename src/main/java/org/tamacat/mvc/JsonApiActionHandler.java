@@ -11,7 +11,7 @@ import org.tamacat.log.Log;
 import org.tamacat.log.LogFactory;
 import org.tamacat.mvc.action.ActionDefine;
 import org.tamacat.mvc.impl.ActionHandler;
-import org.tamacat.mvc.oauth.TokenAuthorization;
+import org.tamacat.mvc.oauth.provider.TokenAuthorization;
 
 public class JsonApiActionHandler extends ActionHandler {
 
@@ -34,12 +34,7 @@ public class JsonApiActionHandler extends ActionHandler {
 	
 	@Override
 	public void handleRequest(HttpServletRequest req, HttpServletResponse resp) {
-		if (auth != null) {
-			processor = new ApiActionProcessor(auth);
-		} else {
-			processor = new ApiActionProcessor();
-		}
-
+		ApiActionProcessor processor = new ApiActionProcessor();
 		ActionDefine def = getActionDefine(req.getRequestURI());
 		if (def != null) {
 			processor.execute(def, req, resp);

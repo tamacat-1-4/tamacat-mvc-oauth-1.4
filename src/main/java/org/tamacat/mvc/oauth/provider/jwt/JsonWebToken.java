@@ -2,7 +2,7 @@
  * Copyright (c) 2016 tamacat.org
  * All rights reserved.
  */
-package org.tamacat.mvc.oauth.token;
+package org.tamacat.mvc.oauth.provider.jwt;
 
 import java.io.StringReader;
 import java.math.BigInteger;
@@ -38,7 +38,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 
 public class JsonWebToken {
 
-	JsonObjectBuilder header;
+	JsonObjectBuilder header = Json.createObjectBuilder();
 	JsonObjectBuilder payload = Json.createObjectBuilder();
 
 	String headerString;
@@ -51,13 +51,48 @@ public class JsonWebToken {
 	boolean isBuilt;
 	long exp;
 	
+	String clientId;
+	String upn;
+	String subject;
+	String issuer;
+	String nonce;
+	String tid;
+		
+	public long getExp() {
+		return exp;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public String getUpn() {
+		return upn;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public String getIssuer() {
+		return issuer;
+	}
+
+	public String getNonce() {
+		return nonce;
+	}
+
+	public String getTid() {
+		return tid;
+	}
+	
 	/**
 	 * @param alg JWSAlgorithm.RS256/HS256
 	 * @return
 	 */
 	public JsonWebToken algorithm(JWSAlgorithm alg) {
 		this.alg = alg;
-		header = Json.createObjectBuilder().add("typ", "JWT").add("alg", alg.getName());
+		header.add("typ", "JWT").add("alg", alg.getName());
 		return this;
 	}
 	
@@ -67,27 +102,38 @@ public class JsonWebToken {
 	
 	//"https://login.tamacat.org"
 	public JsonWebToken issuer(String issuer) {
+		this.issuer = issuer;
 		payload.add("iss", issuer);
 		return this;
 	}
 	
 	public JsonWebToken upn(String upn) {
+		this.upn = upn;
 		payload.add("upn", upn); //OpenID
 		return this;
 	}
 		
+	public JsonWebToken tid(String tid) {
+		this.tid = tid;
+		payload.add("tid", tid); //Tenant ID
+		return this;
+	}
+	
 	public JsonWebToken subject(String subject) {
+		this.subject = subject;
 		payload.add("sub", subject); //User ID (Internal)
 		return this;
 	}
 	
 	public JsonWebToken audience(String audience) {
+		this.clientId = audience;
 		payload.add("aud", audience); //Client ID
 		return this;
 	}
 	
 	public JsonWebToken nonce(String nonce) {
 		//if (nonce == null) nonce = UniqueCodeGenerator.generate();
+		this.nonce = nonce;
 		payload.add("nonce", nonce);
 		return this;
 	}

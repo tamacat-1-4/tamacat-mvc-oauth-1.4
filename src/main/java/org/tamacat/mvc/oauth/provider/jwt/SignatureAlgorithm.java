@@ -2,7 +2,7 @@
  * Copyright (c) 2016 tamacat.org
  * All rights reserved.
  */
-package org.tamacat.mvc.oauth.token;
+package org.tamacat.mvc.oauth.provider.jwt;
 
 import java.security.SignatureException;
 

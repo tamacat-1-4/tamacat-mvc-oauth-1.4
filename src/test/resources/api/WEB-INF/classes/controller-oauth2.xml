@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+	<bean id="auth" class="cloud.tamacat.api.auth.AppClientAuthorization" />
+	
+	<bean id="action" class="org.tamacat.mvc.oauth.provider.OAuthProviderActionHandler">
+		<property name="tokenAuthorization">
+			<ref bean="auth" />
+		</property>
+	</bean>
+		
+	<bean id="oauth2" class="org.tamacat.mvc.JsonApiController">
+		<property name="handler">
+			<ref bean="action" />
+		</property>
+	</bean>
+</beans>

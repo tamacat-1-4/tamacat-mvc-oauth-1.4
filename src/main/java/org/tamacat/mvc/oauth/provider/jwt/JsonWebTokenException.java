@@ -2,7 +2,7 @@
  * Copyright (c) 2017 tamacat.org
  * All rights reserved.
  */
-package org.tamacat.mvc.oauth.token;
+package org.tamacat.mvc.oauth.provider.jwt;
 
 public class JsonWebTokenException extends RuntimeException {
 

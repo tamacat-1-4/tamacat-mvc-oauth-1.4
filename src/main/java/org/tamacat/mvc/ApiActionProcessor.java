@@ -21,36 +21,34 @@ import org.tamacat.mvc.error.HttpStatusException;
 import org.tamacat.mvc.error.InternalServerErrorException;
 import org.tamacat.mvc.error.InvalidRequestException;
 import org.tamacat.mvc.error.NotFoundException;
-import org.tamacat.mvc.oauth.TokenAuthorization;
-import org.tamacat.mvc.oauth.OAuthRequestHandler;
+import org.tamacat.mvc.error.UnauthorizedException;
+import org.tamacat.mvc.oauth.config.OAuthProviderConfig;
 import org.tamacat.mvc.oauth.error.MethodNotAllowedException;
+import org.tamacat.mvc.oauth.util.AuthorizationUtils;
 import org.tamacat.mvc.util.ServletUtils;
 import org.tamacat.util.ClassUtils;
 import org.tamacat.util.IOUtils;
+import org.tamacat.util.StringUtils;
+
+import com.nimbusds.jwt.SignedJWT;
 
 public class ApiActionProcessor extends ActionProcessor {
 	static final Log LOG = LogFactory.getLog(ApiActionProcessor.class);
 	
 	static final String ACTION_KEY = "org.tamacat.mvc.Action";
 	static final String JSON_CONTENT_TYPE = "application/json; charset=UTF-8";
+	static final String DEFAULT_OAUTH_API_PROPS = "oauth2-api.properties";
+	
+	protected OAuthProviderConfig config;
 
-	protected OAuthRequestHandler oauth;
-	
-	public ApiActionProcessor() {}
-	
-	public ApiActionProcessor(TokenAuthorization auth) {
-		if (auth != null) {
-			oauth = new OAuthRequestHandler(auth);
-		}
+	public ApiActionProcessor() {
+		config = new OAuthProviderConfig(DEFAULT_OAUTH_API_PROPS);
 	}
 	
 	@Override
 	public void execute(ActionDefine actionDef, HttpServletRequest req, HttpServletResponse resp) {
-		if (oauth != null) {
-			if (oauth.handleOAuthRequest(req, resp)) {
-				return;
-			}
-		}
+		validateAccessToken(req, resp);
+		
 		ServletUtils.setActionDefine(req, actionDef);
 		Class<?> type = ClassUtils.forName(actionDef.getName());
 		Action action = null;
@@ -114,5 +112,21 @@ public class ApiActionProcessor extends ActionProcessor {
 	@Override
 	protected void setContentType(Action action, HttpServletRequest req, HttpServletResponse resp) {
 		resp.setContentType(JSON_CONTENT_TYPE);
+	}
+
+	public void validateAccessToken(HttpServletRequest req, HttpServletResponse resp) {
+		//Check access_token
+		String token = AuthorizationUtils.getBearerAccessToken(req);
+		LOG.trace("validate access_token="+token);
+		if (StringUtils.isNotEmpty(token)) {
+			SignedJWT jwt = config.getOAuth2CodeGenerator().parseSignedJWT(token);
+			if (jwt != null) {
+				//if (config.getOAuth2CodeGenerator().validateAccessToken(jwt)) {
+				//}
+				req.setAttribute("Authorized.JWT", jwt);
+			}
+			return;
+		}
+		throw new UnauthorizedException();
 	}
 }

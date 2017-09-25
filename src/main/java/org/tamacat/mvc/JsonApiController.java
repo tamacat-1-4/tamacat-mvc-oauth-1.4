@@ -50,7 +50,6 @@ public class JsonApiController implements Controller {
 	}
 	
 	static class JsonStatusExceptionHandler extends StatusExceptionHandler {
-		
 		public JsonStatusExceptionHandler() {
 			errorPagePath = "/WEB-INF/jsp/error/json";
 		}

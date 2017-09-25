@@ -10,8 +10,8 @@ import java.util.Properties;
 
 import org.tamacat.log.Log;
 import org.tamacat.log.LogFactory;
-import org.tamacat.mvc.oauth.token.JsonWebToken;
-import org.tamacat.mvc.oauth.token.OAuthCodeGenerator;
+import org.tamacat.mvc.oauth.provider.jwt.JsonWebToken;
+import org.tamacat.mvc.oauth.provider.jwt.OAuthCodeGenerator;
 import org.tamacat.mvc.oauth.util.PKIUtils;
 import org.tamacat.util.PropertyUtils;
 import org.tamacat.util.StringUtils;

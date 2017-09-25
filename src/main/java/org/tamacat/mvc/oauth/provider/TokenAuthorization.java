@@ -2,9 +2,12 @@
  * Copyright (c) 2017 tamacat.org
  * All rights reserved.
  */
-package org.tamacat.mvc.oauth;
+package org.tamacat.mvc.oauth.provider;
 
-import org.tamacat.mvc.oauth.token.JsonWebToken;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.tamacat.mvc.oauth.provider.jwt.JsonWebToken;
 
 /**
  * Interface for OAuth 2.0 Authorization Framework.
@@ -21,4 +24,6 @@ public interface TokenAuthorization {
 	 * @param clientId
 	 */
 	JsonWebToken getJsonWebToken(String clientId);
+	
+	void activate(HttpServletRequest req, HttpServletResponse resp, JsonWebToken jwt);
 }
