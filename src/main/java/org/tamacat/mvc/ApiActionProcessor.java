@@ -37,12 +37,16 @@ public class ApiActionProcessor extends ActionProcessor {
 	
 	static final String ACTION_KEY = "org.tamacat.mvc.Action";
 	static final String JSON_CONTENT_TYPE = "application/json; charset=UTF-8";
-	static final String DEFAULT_OAUTH_API_PROPS = "oauth2-api.properties";
+	static final String DEFAULT_OAUTH_API_PROPS = "oauth2-provider.properties";
 	
 	protected OAuthProviderConfig config;
 
 	public ApiActionProcessor() {
 		config = new OAuthProviderConfig(DEFAULT_OAUTH_API_PROPS);
+	}
+	
+	public ApiActionProcessor(OAuthProviderConfig config) {
+		this.config = config;
 	}
 	
 	@Override
