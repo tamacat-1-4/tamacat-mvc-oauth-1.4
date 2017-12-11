@@ -40,9 +40,10 @@ public class ApiActionProcessor extends ActionProcessor {
 	static final String DEFAULT_OAUTH_API_PROPS = "oauth2-provider.properties";
 	
 	protected OAuthProviderConfig config;
-
+	protected boolean useOAuth2BearerAuthorization = true;
+	
 	public ApiActionProcessor() {
-		config = new OAuthProviderConfig(DEFAULT_OAUTH_API_PROPS);
+		this(new OAuthProviderConfig(DEFAULT_OAUTH_API_PROPS));
 	}
 	
 	public ApiActionProcessor(OAuthProviderConfig config) {
@@ -51,7 +52,10 @@ public class ApiActionProcessor extends ActionProcessor {
 	
 	@Override
 	public void execute(ActionDefine actionDef, HttpServletRequest req, HttpServletResponse resp) {
-		validateAccessToken(req, resp);
+		if (useOAuth2BearerAuthorization) {
+			validateAccessToken(req, resp);
+		}
+		setAccessControlAllowOriginHeader(resp);
 		
 		ServletUtils.setActionDefine(req, actionDef);
 		Class<?> type = ClassUtils.forName(actionDef.getName());
@@ -132,5 +136,16 @@ public class ApiActionProcessor extends ActionProcessor {
 			return;
 		}
 		throw new UnauthorizedException();
+	}
+	
+	public void useOAuth2BearerAuthorization(boolean useOAuth2BearerAuthorization) {
+		this.useOAuth2BearerAuthorization = useOAuth2BearerAuthorization;
+	}
+	
+	protected void setAccessControlAllowOriginHeader(HttpServletResponse resp) {
+		String accessControlAllowOrigin = config.getAccessControlAllowOrigin();
+		if (StringUtils.isNotEmpty(accessControlAllowOrigin)) {
+			resp.setHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
+		}
 	}
 }

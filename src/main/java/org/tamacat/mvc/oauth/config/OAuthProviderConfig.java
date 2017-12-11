@@ -33,6 +33,7 @@ public class OAuthProviderConfig {
 
 	protected RSAPublicKey publicKey;
 	protected RSAPrivateKey privateKey;
+	protected String accessControlAllowOrigin;
 	
 	protected OAuthCodeGenerator generator;
 
@@ -79,6 +80,11 @@ public class OAuthProviderConfig {
 
 		LOG.trace(getRSAPublicKey());
 		LOG.trace(getRSAPrivateKey());
+		
+		String accessControlAllowOrigin = props.getProperty("Access-Control-Allow-Origin");
+		if (StringUtils.isNotEmpty(accessControlAllowOrigin)) {
+			this.accessControlAllowOrigin = accessControlAllowOrigin;
+		}
 	}
 	
 	public String generateAccessToken(String clientId, JsonWebToken jwt) {
@@ -144,5 +150,9 @@ public class OAuthProviderConfig {
 	
 	public RSAPrivateKey getRSAPrivateKey() {
 		return privateKey;
+	}
+	
+	public String getAccessControlAllowOrigin() {
+		return accessControlAllowOrigin;
 	}
 }

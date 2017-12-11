@@ -25,7 +25,7 @@ public class TokenEndpoint implements Endpoint {
 
 	static final Log LOG = LogFactory.getLog(TokenEndpoint.class);
 	protected TokenAuthorization auth;
-	public OAuthProviderConfig config;
+	protected OAuthProviderConfig config;
 	
 	public TokenEndpoint(OAuthProviderConfig config) {
 		this.config = config;
@@ -71,6 +71,12 @@ public class TokenEndpoint implements Endpoint {
 			LOG.trace("access_token="+accessToken);
 			if (StringUtils.isNotEmpty(accessToken)) {
 				resp.setContentType("application/json");
+				resp.setHeader("Cache-Control", "no-store");
+				resp.setHeader("Pragma", "no-cache");
+				String accessControlAllowOrigin = config.getAccessControlAllowOrigin();
+				if (StringUtils.isNotEmpty(accessControlAllowOrigin)) {
+					resp.setHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
+				}
 				ServletUtils.println(resp, accessToken);
 				return true;
 			}

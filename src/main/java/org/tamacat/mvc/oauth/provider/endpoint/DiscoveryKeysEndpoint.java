@@ -57,6 +57,10 @@ public class DiscoveryKeysEndpoint implements Endpoint {
 			resp.setContentType("application/json");
 			resp.setHeader("Cache-Control", "no-store");
 			resp.setHeader("Pragma", "no-cache");
+			String accessControlAllowOrigin = provider.getAccessControlAllowOrigin();
+			if (StringUtils.isNotEmpty(accessControlAllowOrigin)) {
+				resp.setHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
+			}
 			resp.setStatus(200);
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
