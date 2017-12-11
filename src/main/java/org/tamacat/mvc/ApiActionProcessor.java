@@ -55,7 +55,7 @@ public class ApiActionProcessor extends ActionProcessor {
 		if (useOAuth2BearerAuthorization) {
 			validateAccessToken(req, resp);
 		}
-		setAccessControlAllowOriginHeader(resp);
+		setAccessControlAllowResponse(resp);
 		
 		ServletUtils.setActionDefine(req, actionDef);
 		Class<?> type = ClassUtils.forName(actionDef.getName());
@@ -142,10 +142,18 @@ public class ApiActionProcessor extends ActionProcessor {
 		this.useOAuth2BearerAuthorization = useOAuth2BearerAuthorization;
 	}
 	
-	protected void setAccessControlAllowOriginHeader(HttpServletResponse resp) {
+	protected void setAccessControlAllowResponse(HttpServletResponse resp) {
 		String accessControlAllowOrigin = config.getAccessControlAllowOrigin();
 		if (StringUtils.isNotEmpty(accessControlAllowOrigin)) {
 			resp.setHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
+		}
+		String accessControlAllowMethods = config.getAccessControlAllowMethods();
+		if (StringUtils.isNotEmpty(accessControlAllowMethods)) {
+			resp.setHeader("Access-Control-Allow-Methods", accessControlAllowMethods);
+		}
+		String accessControlAllowHeaders = config.getAccessControlAllowHeaders();
+		if (StringUtils.isNotEmpty(accessControlAllowHeaders)) {
+			resp.setHeader("Access-Control-Allow-Headers", accessControlAllowHeaders);
 		}
 	}
 }

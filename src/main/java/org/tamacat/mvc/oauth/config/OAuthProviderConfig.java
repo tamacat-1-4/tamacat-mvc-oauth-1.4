@@ -34,6 +34,8 @@ public class OAuthProviderConfig {
 	protected RSAPublicKey publicKey;
 	protected RSAPrivateKey privateKey;
 	protected String accessControlAllowOrigin;
+	protected String accessControlAllowMethods;
+	protected String accessControlAllowHeaders;
 	
 	protected OAuthCodeGenerator generator;
 
@@ -154,5 +156,13 @@ public class OAuthProviderConfig {
 	
 	public String getAccessControlAllowOrigin() {
 		return accessControlAllowOrigin;
+	}
+	
+	public String getAccessControlAllowMethods() {
+		return accessControlAllowMethods;
+	}
+	
+	public String getAccessControlAllowHeaders() {
+		return accessControlAllowHeaders;
 	}
 }
