@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2017 tamacat.org
+ * All rights reserved.
+ */
 package org.tamacat.mvc.oauth.provider;
 
 import static org.junit.Assert.*;

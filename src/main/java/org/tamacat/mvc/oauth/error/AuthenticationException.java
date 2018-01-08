@@ -31,8 +31,6 @@ public class AuthenticationException extends OAuthException {
 	}
 	
 	protected ErrorCode errorCode;
-	protected String description;
-	protected String errorUri;
 	
 	public AuthenticationException() {}
 	
@@ -55,22 +53,6 @@ public class AuthenticationException extends OAuthException {
 		this.errorCode = errorCode;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getErrorUri() {
-		return errorUri;
-	}
-
-	public void setErrorUri(String errorUri) {
-		this.errorUri = errorUri;
-	}
-	
 	public String getErrorString() {
 		StringBuilder message = new StringBuilder();
 		if (StringUtils.isNotEmpty(errorCode)) {

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 tamacat.org
+ * All rights reserved.
+ */
 package org.tamacat.mvc.oauth.util;
 
 import java.io.IOException;

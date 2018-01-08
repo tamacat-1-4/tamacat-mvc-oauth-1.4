@@ -31,4 +31,20 @@ public class OAuthException extends RuntimeException {
 	public OAuthException(String message, Throwable cause) {
 		super(message, cause);
 	}
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getErrorUri() {
+		return errorUri;
+	}
+
+	public void setErrorUri(String errorUri) {
+		this.errorUri = errorUri;
+	}
 }
