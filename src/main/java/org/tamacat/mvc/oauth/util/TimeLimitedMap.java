@@ -57,12 +57,6 @@ public class TimeLimitedMap<K, V> implements Map<K, V> {
         expiringKeys = new WeakHashMap<K, ExpiringKey<K>>();
         this.maxLifeTimeMillis = defaultMaxLifeTimeMillis;
     }
-
-    public TimeLimitedMap(long defaultMaxLifeTimeMillis, int initialCapacity) {
-        internalMap = new ConcurrentHashMap<K, V>(initialCapacity);
-        expiringKeys = new WeakHashMap<K, ExpiringKey<K>>(initialCapacity);
-        this.maxLifeTimeMillis = defaultMaxLifeTimeMillis;
-    }
     
     @Override
     public int size() {
@@ -203,57 +197,63 @@ public class TimeLimitedMap<K, V> implements Map<K, V> {
     @SuppressWarnings("hiding")
 	class ExpiringKey<K> implements Delayed {
 
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
         final long maxLifeTimeMillis;
         final K key;
 
         public ExpiringKey(K key, long maxLifeTimeMillis) {
-            this.maxLifeTimeMillis = maxLifeTimeMillis*1000*1000;
+            this.maxLifeTimeMillis = maxLifeTimeMillis;
             this.key = key;
         }
 
         public K getKey() {
             return key;
         }
-        
-        @SuppressWarnings("unchecked")
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final ExpiringKey<K> other = (ExpiringKey<K>) obj;
-            if (this.key != other.key && (this.key == null || !this.key.equals(other.key))) {
-                return false;
-            }
-            return true;
-        }
-        
-        @Override
-        public int hashCode() {
-            int hash = 7;
-            hash = 31 * hash + (this.key != null ? this.key.hashCode() : 0);
-            return hash;
-        }
 
         @Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result + ((key == null) ? 0 : key.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			@SuppressWarnings("unchecked")
+			ExpiringKey<K> other = (ExpiringKey<K>) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (key == null) {
+				if (other.key != null)
+					return false;
+			} else if (!key.equals(other.key))
+				return false;
+			return true;
+		}
+
+		@Override
         public long getDelay(TimeUnit unit) {
-            return unit.convert(getDelayMillis(), TimeUnit.NANOSECONDS);
+            return unit.convert(getDelayMillis(), TimeUnit.MILLISECONDS);
         }
 
         long getDelayMillis() {
-            return (startTime + maxLifeTimeMillis) - System.nanoTime();
+            return (startTime + maxLifeTimeMillis) - System.currentTimeMillis();
         }
 
         public void renew() {
-            startTime = System.nanoTime();
+            startTime = System.currentTimeMillis();
         }
 
         public void expire() {
-            startTime =  System.nanoTime() - maxLifeTimeMillis - 1;
+            startTime =  System.currentTimeMillis() - maxLifeTimeMillis - 1;
         }
 
 		@SuppressWarnings("unchecked")
@@ -261,5 +261,10 @@ public class TimeLimitedMap<K, V> implements Map<K, V> {
         public int compareTo(Delayed that) {
             return Long.compare(this.getDelayMillis(), ((ExpiringKey<K>) that).getDelayMillis());
         }
+
+		@SuppressWarnings("rawtypes")
+		TimeLimitedMap getOuterType() {
+			return TimeLimitedMap.this;
+		}
     }
 }
