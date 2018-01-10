@@ -1,5 +1,5 @@
 Implementation-Title: tamacat-mvc-oauth
-Implementation-Version: 1.4-20180109
+Implementation-Version: 1.4-20180110
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.tamacat.mvc.oauth
 Bundle-Name: tamacat-mvc-oauth
