@@ -4,9 +4,10 @@
  */
 package org.tamacat.mvc.oauth.error;
 
+import org.tamacat.mvc.error.ClientSideException;
 import org.tamacat.mvc.error.HttpStatusException;
 
-public class TooManyRequestsException extends HttpStatusException {
+public class TooManyRequestsException extends HttpStatusException implements ClientSideException {
 
 	private static final long serialVersionUID = 1L;
 
