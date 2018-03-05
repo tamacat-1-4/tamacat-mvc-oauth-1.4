@@ -87,6 +87,16 @@ public class OAuthProviderConfig {
 		if (StringUtils.isNotEmpty(accessControlAllowOrigin)) {
 			this.accessControlAllowOrigin = accessControlAllowOrigin;
 		}
+		
+		String accessControlAllowMethods = props.getProperty("Access-Control-Allow-Methods");
+		if (StringUtils.isNotEmpty(accessControlAllowMethods)) {
+			this.accessControlAllowMethods = accessControlAllowMethods;
+		}
+		
+		String accessControlAllowHeaders = props.getProperty("Access-Control-Allow-Headers");
+		if (StringUtils.isNotEmpty(accessControlAllowHeaders)) {
+			this.accessControlAllowHeaders = accessControlAllowHeaders;
+		}
 	}
 	
 	public String generateAccessToken(String clientId, JsonWebToken jwt) {
