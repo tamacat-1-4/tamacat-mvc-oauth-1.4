@@ -138,7 +138,7 @@ public class ApiActionProcessor extends ActionProcessor {
 		throw new UnauthorizedException();
 	}
 	
-	public void useOAuth2BearerAuthorization(boolean useOAuth2BearerAuthorization) {
+	public void setUseOAuth2BearerAuthorization(boolean useOAuth2BearerAuthorization) {
 		this.useOAuth2BearerAuthorization = useOAuth2BearerAuthorization;
 	}
 	
