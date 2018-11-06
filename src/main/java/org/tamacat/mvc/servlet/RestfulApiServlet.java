@@ -43,6 +43,15 @@ public class RestfulApiServlet extends StandardServlet {
 		}
 	}
 	
+    @Override
+	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (request.getMethod().equalsIgnoreCase("PATCH")){
+           doPatch(request, response);
+        } else {
+            super.service(request, response);
+        }
+    }
+    
 	@Override
 	protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -67,6 +76,11 @@ public class RestfulApiServlet extends StandardServlet {
 
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		process(req, resp);
+	}
+	
+	protected void doPatch(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		process(req, resp);
 	}
