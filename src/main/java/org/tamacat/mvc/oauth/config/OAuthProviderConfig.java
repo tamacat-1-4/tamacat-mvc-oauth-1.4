@@ -23,6 +23,8 @@ public class OAuthProviderConfig {
 	
 	String issuer;					// localhost
 	String tokenEndpoint;			// /oauth2/token
+	String introspectEndpoint;			// /oauth2/introspect
+	String userinfoEndpoint;			// /oauth2/userinfo
 	String jwksUri;					// /oauth2/discovery/keys
 	
 	protected String tokenType = "Bearer";
@@ -57,8 +59,10 @@ public class OAuthProviderConfig {
 		Properties props = PropertyUtils.getProperties(propFile);
 		setIssuer(props.getProperty("issuer"));
 		
-		tokenEndpoint = props.getProperty("token_endpoint");
-		jwksUri = props.getProperty("jwks_uri");
+		setTokenEndpoint(props.getProperty("token_endpoint"));
+		setIntrospectEndpoint(props.getProperty("introspect_endpoint"));
+		setUserInfoEndpoint(props.getProperty("userinfo_endpoint"));
+		setJwksUri(props.getProperty("jwks_uri"));
 		
 		accessTokenExpiresIn = StringUtils.parse(props.getProperty("access_token_expired_in"), accessTokenExpiresIn);
 		refreshTokenExpiresIn = StringUtils.parse(props.getProperty("refresh_token_expired_in"), refreshTokenExpiresIn);
@@ -121,15 +125,39 @@ public class OAuthProviderConfig {
 	}
 	
 	public void setTokenEndpoint(String tokenEndpoint) {
-		this.tokenEndpoint = tokenEndpoint;
+		if (StringUtils.isNotEmpty(tokenEndpoint)) {
+			this.tokenEndpoint = tokenEndpoint.replace("${issuer}", getIssuer());
+		}
 	}
-		
+	
+	public String getIntrospectEndpoint() {
+		return introspectEndpoint;
+	}
+	
+	public void setIntrospectEndpoint(String introspectEndpoint) {
+		if (StringUtils.isNotEmpty(introspectEndpoint)) {
+			this.introspectEndpoint = introspectEndpoint.replace("${issuer}", getIssuer());
+		}
+	}
+	
+	public String getUserInfoEndpoint() {
+		return userinfoEndpoint;
+	}
+	
+	public void setUserInfoEndpoint(String userinfoEndpoint) {
+		if (StringUtils.isNotEmpty(userinfoEndpoint)) {
+			this.userinfoEndpoint = userinfoEndpoint.replace("${issuer}", getIssuer());
+		}
+	}
+	
 	public String getJwksUri() {
 		return jwksUri;
 	}
 	
 	public void setJwksUri(String jwksUri) {
-		this.jwksUri = jwksUri;
+		if (StringUtils.isNotEmpty(jwksUri)) {
+			this.jwksUri = jwksUri.replace("${issuer}", getIssuer());
+		}
 	}
 	
 	public String getTokenType() {

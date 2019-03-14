@@ -6,11 +6,23 @@ package org.tamacat.mvc;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.annotation.HttpMethodConstraint;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.tamacat.log.Log;
 import org.tamacat.log.LogFactory;
 import org.tamacat.mvc.action.Action;
@@ -24,6 +36,7 @@ import org.tamacat.mvc.error.NotFoundException;
 import org.tamacat.mvc.error.UnauthorizedException;
 import org.tamacat.mvc.oauth.config.OAuthProviderConfig;
 import org.tamacat.mvc.oauth.error.MethodNotAllowedException;
+import org.tamacat.mvc.oauth.provider.jwt.JsonWebToken;
 import org.tamacat.mvc.oauth.util.AuthorizationUtils;
 import org.tamacat.mvc.util.ServletUtils;
 import org.tamacat.util.ClassUtils;
@@ -41,7 +54,7 @@ public class ApiActionProcessor extends ActionProcessor {
 	
 	protected OAuthProviderConfig config;
 	protected boolean useOAuth2BearerAuthorization = true;
-	
+		
 	public ApiActionProcessor() {
 		this(new OAuthProviderConfig(DEFAULT_OAUTH_API_PROPS));
 	}
@@ -127,15 +140,79 @@ public class ApiActionProcessor extends ActionProcessor {
 		String token = AuthorizationUtils.getBearerAccessToken(req);
 		LOG.trace("validate access_token="+token);
 		if (StringUtils.isNotEmpty(token)) {
-			SignedJWT jwt = config.getOAuth2CodeGenerator().parseSignedJWT(token);
-			if (jwt != null) {
-				//if (config.getOAuth2CodeGenerator().validateAccessToken(jwt)) {
-				//}
+			if (StringUtils.isNotEmpty(config.getIntrospectEndpoint())) {
+				JsonWebToken jwt = introspect(token);
 				req.setAttribute("Authorized.JWT", jwt);
+			} else {
+				SignedJWT jwt = config.getOAuth2CodeGenerator().parseSignedJWT(token);
+				if (jwt != null) {
+					//if (config.getOAuth2CodeGenerator().validateAccessToken(jwt))
+					req.setAttribute("Authorized.JWT", jwt);
+				}
 			}
 			return;
 		}
 		throw new UnauthorizedException();
+	}
+	
+	protected JsonWebToken introspect(String accessToken) {
+		JsonWebToken jwt = new JsonWebToken();
+		try {
+			String endpoint = config.getIntrospectEndpoint();
+			LOG.debug(endpoint);
+			HttpPost request = new HttpPost(endpoint);
+			request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+			
+			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+			nvps.add(new BasicNameValuePair("token", accessToken));
+			request.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
+			
+			LOG.debug(request);
+			HttpClientBuilder builder = HttpClients.custom();
+			HttpClient client = builder.build();
+			HttpResponse response = client.execute(request);
+			LOG.debug(response.getStatusLine());
+			if (response.getStatusLine().getStatusCode() < 300) {
+				JsonObject json = Json.createReader(response.getEntity().getContent()).readObject();
+				//LOG.debug(StringUtils.formatJson(json.toString()));
+				boolean active = false;
+				if (json.containsKey("active")) {
+					active = json.getBoolean("active");
+				}
+				if (active) {
+					if (json.containsKey("tid")) {
+						jwt.tid(json.getString("tid"));
+					}
+					if (json.containsKey("upn")) {
+						jwt.upn(json.getString("upn"));
+					}
+					if (json.containsKey("client_id")) {
+						jwt.audience(json.getString("client_id"));
+					}
+					if (json.containsKey("app_id")) {
+						jwt.set("app_id", json.getString("app_id"));
+					}
+					if (json.containsKey("app_name")) {
+						jwt.set("app_name", json.getString("app_name"));
+					}
+					if (json.containsKey("iss")) {
+						jwt.issuer(json.getString("iss"));
+					}
+					if (json.containsKey("scopes")) {
+						jwt.set("scopes", json.getString("scopes"));
+					}
+					if (json.containsKey("iat")) {
+						jwt.issueAt(json.getJsonNumber("iat").longValue());
+					}
+					if (json.containsKey("exp")) {
+						jwt.expiration(json.getJsonNumber("exp").longValue());
+					}
+				}
+			}
+		} catch (Exception e) {
+			LOG.warn(e.getMessage());
+		}
+		return jwt;
 	}
 	
 	public void setUseOAuth2BearerAuthorization(boolean useOAuth2BearerAuthorization) {
