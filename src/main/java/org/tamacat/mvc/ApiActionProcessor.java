@@ -162,6 +162,7 @@ public class ApiActionProcessor extends ActionProcessor {
 			LOG.debug(endpoint);
 			HttpPost request = new HttpPost(endpoint);
 			request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+			request.setHeader("Authorization", "Bearer "+accessToken);
 			
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			nvps.add(new BasicNameValuePair("token", accessToken));

@@ -6,6 +6,8 @@ package org.tamacat.mvc.oauth.token;
 
 import static org.junit.Assert.*;
 
+import java.util.Date;
+
 import org.junit.Test;
 import org.tamacat.mvc.oauth.config.OAuthProviderConfig;
 import org.tamacat.mvc.oauth.provider.jwt.JsonWebToken;
@@ -33,8 +35,14 @@ public class JsonWebTokenTest {
 	}
 
 	@Test
-	public void testSet() {
+	public void testVerifyExpiration() {
+		OAuthProviderConfig config = new OAuthProviderConfig();
+		JsonWebToken jwt = new JsonWebToken().algorithm(config.getJWSAlgorithm())
+				.expiration(1553590587L);
+		System.out.println(jwt.verifyExpiration());
 		
+		System.out.println(System.currentTimeMillis()/1000);
+		System.out.println(new Date().getTime()/1000);
 	}
 
 }

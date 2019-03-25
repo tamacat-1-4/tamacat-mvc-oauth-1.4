@@ -30,9 +30,9 @@ public class GeneratePKI {
 		RSAPublicKey publicKey = (RSAPublicKey)kp.getPublic();
 		RSAPrivateKey privateKey = (RSAPrivateKey)kp.getPrivate();
 		
-		System.out.println("RSA_public_key="+Base64.getUrlEncoder().encodeToString(publicKey.getEncoded()));
-		System.out.println("RSA_private_key="+Base64.getUrlEncoder().encodeToString(privateKey.getEncoded()));
-		System.out.println("RSA_public_key_exponent="+ Base64.getUrlEncoder().encodeToString(BigIntegerUtils.toBytesUnsigned(publicKey.getPublicExponent())));
-		System.out.println("RSA_private_key_exponent="+Base64.getUrlEncoder().encodeToString(BigIntegerUtils.toBytesUnsigned(privateKey.getPrivateExponent())));
+		System.out.println("RSA_public_key="+Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+		System.out.println("RSA_private_key="+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+		System.out.println("RSA_public_key_exponent="+ Base64.getEncoder().encodeToString(BigIntegerUtils.toBytesUnsigned(publicKey.getPublicExponent())));
+		System.out.println("RSA_private_key_exponent="+Base64.getEncoder().encodeToString(BigIntegerUtils.toBytesUnsigned(privateKey.getPrivateExponent())));
 	}
 }

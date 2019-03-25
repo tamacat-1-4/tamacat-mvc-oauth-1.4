@@ -50,7 +50,7 @@ public class PKIUtils {
 	
 	public static RSAPublicKey getRSAPublicKey(String n) {
 		try {
-			X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getUrlDecoder().decode(n));
+			X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(n));
 			return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(spec);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -60,7 +60,7 @@ public class PKIUtils {
 	
 	public static RSAPrivateKey getRSAPrivateKey(String n) {
 		try {
-			PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getUrlDecoder().decode(n));
+			PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(n));
 			return (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(spec);
 		} catch (Exception ex) {
 			ex.printStackTrace();
