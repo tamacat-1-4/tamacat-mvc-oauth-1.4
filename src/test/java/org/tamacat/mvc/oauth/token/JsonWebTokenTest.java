@@ -39,8 +39,12 @@ public class JsonWebTokenTest {
 		OAuthProviderConfig config = new OAuthProviderConfig();
 		JsonWebToken jwt = new JsonWebToken().algorithm(config.getJWSAlgorithm())
 				.expiration(1553590587L);
-		System.out.println(jwt.verifyExpiration());
-		
+		try {
+			System.out.println(jwt.verifyExpiration());
+		} catch (Exception e) {
+			//e.printStackTrace();
+			assertEquals("Access Token time expired.", e.getMessage());
+		}
 		System.out.println(System.currentTimeMillis()/1000);
 		System.out.println(new Date().getTime()/1000);
 	}
