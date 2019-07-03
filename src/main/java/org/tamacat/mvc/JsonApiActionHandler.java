@@ -42,4 +42,20 @@ public class JsonApiActionHandler extends ActionHandler {
 	public void setUseOAuth2BearerAuthorization(boolean useOAuth2BearerAuthorization) {
 		processor.setUseOAuth2BearerAuthorization(useOAuth2BearerAuthorization);
 	}
+	
+	/**
+	 * Allow trust Self-signed certification. (for Development/Test use)
+	 * @since 1.4-20190702
+	 */
+	public void setAllowTrustSelfSignedCertificates(boolean allowTrustSelfSignedCertificates) {
+		processor.setAllowTrustSelfSignedCertificates(allowTrustSelfSignedCertificates);
+	}
+
+	/**
+	 * Disabled SSL hostname verifier. (for Development/Test use)
+	 * @since 1.4-20190702
+	 */
+	public void setDisabledSSLHostnameVerifier(boolean disabledSSLHostnameVerifier) {
+		processor.setDisabledSSLHostnameVerifier(disabledSSLHostnameVerifier);
+	}
 }

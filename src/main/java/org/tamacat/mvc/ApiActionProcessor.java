@@ -20,9 +20,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.ssl.SSLContexts;
 import org.tamacat.log.Log;
 import org.tamacat.log.LogFactory;
 import org.tamacat.mvc.action.Action;
@@ -54,7 +57,10 @@ public class ApiActionProcessor extends ActionProcessor {
 	
 	protected OAuthProviderConfig config;
 	protected boolean useOAuth2BearerAuthorization = true;
-		
+	
+	protected boolean allowTrustSelfSignedCertificates;
+	protected boolean disabledSSLHostnameVerifier;
+	
 	public ApiActionProcessor() {
 		this(new OAuthProviderConfig(DEFAULT_OAUTH_API_PROPS));
 	}
@@ -170,6 +176,13 @@ public class ApiActionProcessor extends ActionProcessor {
 			
 			LOG.debug(request);
 			HttpClientBuilder builder = HttpClients.custom();
+			if (allowTrustSelfSignedCertificates) {
+				builder.setSSLContext(SSLContexts.custom().loadTrustMaterial(new TrustSelfSignedStrategy()).build());
+			}
+			if (disabledSSLHostnameVerifier) {
+				builder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+			}
+			
 			HttpClient client = builder.build();
 			HttpResponse response = client.execute(request);
 			LOG.debug(response.getStatusLine());
@@ -218,6 +231,22 @@ public class ApiActionProcessor extends ActionProcessor {
 	
 	public void setUseOAuth2BearerAuthorization(boolean useOAuth2BearerAuthorization) {
 		this.useOAuth2BearerAuthorization = useOAuth2BearerAuthorization;
+	}
+	
+	/**
+	 * Allow trust Self-signed certification. (for Development/Test use)
+	 * @since 1.4-20190702
+	 */
+	public void setAllowTrustSelfSignedCertificates(boolean allowTrustSelfSignedCertificates) {
+		this.allowTrustSelfSignedCertificates = allowTrustSelfSignedCertificates;
+	}
+	
+	/**
+	 * Disabled SSL hostname verifier. (for Development/Test use)
+	 * @since 1.4-20190702
+	 */
+	public void setDisabledSSLHostnameVerifier(boolean disabledSSLHostnameVerifier) {
+		this.disabledSSLHostnameVerifier = disabledSSLHostnameVerifier;
 	}
 	
 	protected void setAccessControlAllowResponse(HttpServletResponse resp) {
