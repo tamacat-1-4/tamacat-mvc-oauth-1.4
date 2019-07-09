@@ -17,9 +17,14 @@ public class JsonApiActionHandler extends ActionHandler {
 	static final Log LOG = LogFactory.getLog(JsonApiActionHandler.class);
 	static final String JSON_CONTENT_TYPE = "application/json; charset=UTF-8";
 
-	protected ApiActionProcessor processor = new ApiActionProcessor();
+	protected ApiActionProcessor processor;
 
 	public JsonApiActionHandler() {
+		this(new ApiActionProcessor());	
+	}
+	
+	protected JsonApiActionHandler(ApiActionProcessor processor) {
+		setApiActionProcessor(processor);
 	}
 
 	public void setApiActionProcessor(ApiActionProcessor processor) {
